@@ -13,6 +13,7 @@ def request_oauth_account_token_flow():
     chrome_options.add_argument("--disable-extensions")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
+    chrome_options.binary_location = r"C:\Program Files\Google\Chrome\Application\chrome.exe"  # Update with your own path if different, probably need to set it as a startup flag in the future.
 
     print("""[AuthFlow] This script will now open Google Chrome on your device. 
     Make that you allow Python (or PyCharm) to control Chrome (macOS only). 
