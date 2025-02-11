@@ -44,18 +44,44 @@ void app_main() {
     ESP_ERROR_CHECK(esp_ble_tx_power_set(ESP_BLE_PWR_TYPE_ADV, ESP_PWR_LVL_P9));
     ESP_LOGI(TAG, "Set BLE TX Power to 9 dBm");
 
-    uint8_t adv_raw_data[31] = {
-        0x02, 0x01, 0x06,
+    // NOTE: BLE MAC address can be anything
+    // FMDN frame supporting a 160-bit curve.
+    // details https://developers.google.com/nearby/fast-pair/specifications/extensions/fmdn#advertised-frames
+    uint8_t adv_raw_data[1+2 + 1+25] = {
+        0x02, // 0 Length
+        0x01, // 1 Flags data type value
+        0x06, // 2 Flags data
 
         // Service Data
-        0x19, 0x16, 0xAA, 0xFE, 0x41,
+        0x19, // 3 Length 25bytes
+        0x16, // 4 Service data data type value
+        0xAA, // 5 16-bit service UUID
+        0xFE, // 6 type
+        0x41, // 7 FMDN frame type with unwanted tracking protection mode indication
 
-        // and 20-byte EID...
+        // 8-27 20-byte tacking field EID (ephemeral identifier)
+        // byte pattern can be simply swapped in binary
+        0x56,0x57,0x58,0x59,0x5A,0x5B,0x5C,0x5D,0x5E,0x5F,0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67,0x68,0x69,
+
+        0x01, // 28 Hashed flags
+        /* The hashed flags field is calculated as follows (bits are referenced from most significant to least significant):
+          Bits 0-4: Reserved (set to zeros).
+          Bits 5-6 indicates the battery level for the device as follows:
+            00: Battery level indication unsupported
+            01: Normal battery level
+            10: Low battery level
+            11: Critically low battery level (battery replacement needed soon)
+          Bit 7 is set to 1 if the beacon is in unwanted tracking protection mode, and 0 otherwise
+        */
     };
 
-    uint8_t eid_bytes[20];
-    hex_string_to_bytes(eid_string, eid_bytes, 20);
-    memcpy(&adv_raw_data[8], eid_bytes, 20);
+    /* string based EID injection used */
+    if(eid_string[0] != 'I')
+    {
+      uint8_t eid_bytes[20];
+      hex_string_to_bytes(eid_string, eid_bytes, 20);
+      memcpy(&adv_raw_data[8], eid_bytes, 20);
+    }
 
     ESP_ERROR_CHECK(esp_ble_gap_config_adv_data_raw(adv_raw_data, sizeof(adv_raw_data)));
 
