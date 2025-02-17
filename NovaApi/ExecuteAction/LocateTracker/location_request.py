@@ -29,9 +29,9 @@ def create_location_request(canonic_device_id, fcm_registration_id, request_uuid
     return hex_payload
 
 
-def get_location_data_for_device(canonic_device_id):
+def get_location_data_for_device(canonic_device_id, name):
 
-    print("[LocationRequest] Requesting location data for device with canonic ID:", canonic_device_id)
+    print(f"[LocationRequest] Requesting location data for {name}...")
 
     result = None
     request_uuid = generate_random_uuid()
@@ -41,7 +41,7 @@ def get_location_data_for_device(canonic_device_id):
         device_update = parse_device_update_protobuf(response)
 
         if device_update.fcmMetadata.requestUuid == request_uuid:
-            print("[LocationRequest] Location request successful.")
+            print("[LocationRequest] Location request successful. Decrypting locations...")
             result = parse_device_update_protobuf(response)
             #print_device_update_protobuf(response)
 
@@ -51,9 +51,9 @@ def get_location_data_for_device(canonic_device_id):
     nova_request(NOVA_ACTION_API_SCOPE, hex_payload)
 
     while result is None:
-        asyncio.get_event_loop().run_until_complete(asyncio.sleep(1))
+        asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.1))
 
     decrypt_location_response_locations(result)
 
 if __name__ == '__main__':
-    get_location_data_for_device(get_example_data("sample_canonic_device_id"))
+    get_location_data_for_device(get_example_data("sample_canonic_device_id"), "Test")

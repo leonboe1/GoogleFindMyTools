@@ -66,9 +66,10 @@ def list_devices():
         register_esp32()
     else:
         selected_idx = int(selected_value) - 1
+        selected_device_name = canonic_ids[selected_idx][0]
         selected_canonic_id = canonic_ids[selected_idx][1]
 
-        get_location_data_for_device(selected_canonic_id)
+        get_location_data_for_device(selected_canonic_id, selected_device_name)
 
 
 if __name__ == '__main__':
