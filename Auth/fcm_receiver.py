@@ -108,7 +108,7 @@ class FcmReceiver:
         await self._register_for_fcm()
         await self.pc.start()
         self._listening = True
-        print("[FCMReceiver] Listening for notifications.")
+        print("[FCMReceiver] Listening for notifications. This can take a few seconds...")
 
 
 if __name__ == "__main__":
