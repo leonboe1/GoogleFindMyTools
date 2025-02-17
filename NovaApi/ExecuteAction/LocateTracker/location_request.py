@@ -44,8 +44,6 @@ def get_location_data_for_device(canonic_device_id):
             print("[LocationRequest] Location request successful.")
             result = parse_device_update_protobuf(response)
             #print_device_update_protobuf(response)
-        else:
-            print("[LocationRequest] Received response for a different request. Ignoring.")
 
     fcm_token = FcmReceiver().register_for_location_updates(handle_location_response)
 

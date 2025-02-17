@@ -64,7 +64,6 @@ class FcmReceiver:
 
     # Define a callback function for handling notifications
     def _on_notification(self, obj, notification, data_message):
-        print("[FCMReceiver] Notification received!")
 
         # Check if the payload is present
         if 'data' in obj and 'com.google.android.apps.adm.FCM_PAYLOAD' in obj['data']:
