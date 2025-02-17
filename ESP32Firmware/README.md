@@ -24,7 +24,7 @@ The firmware works differently to regular Find My Device trackers. It is made to
 ## Known Issues
 
 - You need to run main.c every 3-7 days to keep receiving location reports from the server. This is because the advertisements have to be "announced" to Google. 
-- Might not work with 'fresh' Google accounts, make sure that you used the Find My Device app on an Android device before registering a new tracker
+- Might not work with 'fresh' Google accounts: "Your encryption data is locked on your device" is shown if you have never paired a Find My Device tracker with an Android device. Solution: Temporarily pair a real tracker with your phone.
 - You cannot view locations for the ESP32 in the Google Find My Device app. You will need to use the Python script to do so.
 - No privacy features such as rotating MAC addresses are implemented
 - The firmware was built to receive as many network reports as possible. Therefore, it might consume more power than necessary. To fix this, you can tweak the parameters (TX Power and advertising interval) in [`main.c`](main/main.c)
