@@ -13,6 +13,8 @@ def request_oauth_account_token_flow():
     chrome_options.add_argument("--disable-extensions")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
+
+    # For Windows users only: set binary location to "C:\ProgramData\chocolatey\bin\chrome.exe" or similar
     # chrome_options.binary_location = r"INSERT_PATH_TO_CHROME_BINARY_HERE"
 
     print("""[AuthFlow] This script will now open Google Chrome on your device to login to your Google account.

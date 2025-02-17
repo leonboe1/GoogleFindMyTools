@@ -13,9 +13,18 @@ from KeyBackup.shared_key_request import get_security_domain_request_url
 
 # Initialize undetected Chrome WebDriver
 def create_driver():
-    options = uc.ChromeOptions()
-    options.add_argument("--start-maximized")
-    return uc.Chrome(options=options)
+    chrome_options = uc.ChromeOptions()
+    chrome_options.add_argument("--start-maximized")
+
+    # For Windows users only: set binary location to "C:\ProgramData\chocolatey\bin\chrome.exe" or similar
+    # chrome_options.binary_location = r"INSERT_PATH_TO_CHROME_BINARY_HERE"
+
+    try:
+        driver = uc.Chrome(options=chrome_options)
+        print("[SharedKeyFlow] ChromeDriver installed and browser started.")
+        return driver
+    except Exception as e:
+        raise Exception("[SharedKeyFlow] Failed to install ChromeDriver. A current version of Chrome was not detected on your system.\n\nIf you know that Chrome is installed, first try to update Chrome to the latest version. If the script is still not working afterward, open the file 'KeyBackup/shared_key_flow.py' and set the path to your Chrome executable in line 20.")
 
 
 def request_shared_key_flow():
