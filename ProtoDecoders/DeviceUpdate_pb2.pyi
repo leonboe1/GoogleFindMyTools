@@ -119,12 +119,14 @@ class GetEidInfoForE2eeDevicesResponse(_message.Message):
     def __init__(self, encryptedOwnerKeyAndMetadata: _Optional[_Union[EncryptedOwnerKeyAndMetadata, _Mapping]] = ...) -> None: ...
 
 class EncryptedOwnerKeyAndMetadata(_message.Message):
-    __slots__ = ("encryptedOwnerKey", "securityDomain")
+    __slots__ = ("encryptedOwnerKey", "ownerKeyVersion", "securityDomain")
     ENCRYPTEDOWNERKEY_FIELD_NUMBER: _ClassVar[int]
+    OWNERKEYVERSION_FIELD_NUMBER: _ClassVar[int]
     SECURITYDOMAIN_FIELD_NUMBER: _ClassVar[int]
     encryptedOwnerKey: bytes
+    ownerKeyVersion: int
     securityDomain: str
-    def __init__(self, encryptedOwnerKey: _Optional[bytes] = ..., securityDomain: _Optional[str] = ...) -> None: ...
+    def __init__(self, encryptedOwnerKey: _Optional[bytes] = ..., ownerKeyVersion: _Optional[int] = ..., securityDomain: _Optional[str] = ...) -> None: ...
 
 class DevicesList(_message.Message):
     __slots__ = ("deviceMetadata",)

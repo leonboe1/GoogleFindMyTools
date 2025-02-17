@@ -15,6 +15,9 @@ def _retrieve_owner_key() -> str:
 
     encrypted_owner_key = eid_info.encryptedOwnerKeyAndMetadata.encryptedOwnerKey
     owner_key = decrypt_owner_key(shared_key, encrypted_owner_key)
+    owner_key_version = eid_info.encryptedOwnerKeyAndMetadata.ownerKeyVersion
+
+    print(f"Retrieved owner key with version: {owner_key_version}")
 
     return owner_key.hex()
 

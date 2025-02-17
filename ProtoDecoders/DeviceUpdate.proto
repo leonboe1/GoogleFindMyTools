@@ -12,6 +12,7 @@ message GetEidInfoForE2eeDevicesResponse {
 
 message EncryptedOwnerKeyAndMetadata {
   bytes encryptedOwnerKey = 1;
+  int32 ownerKeyVersion = 2;
   string securityDomain = 3;
 }
 

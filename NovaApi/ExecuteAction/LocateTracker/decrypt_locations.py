@@ -24,15 +24,18 @@ def is_mcu_tracker(device_registration: DeviceRegistration) -> bool:
 
 def retrieve_identity_key(device_registration: DeviceRegistration) -> bytes:
     is_mcu = is_mcu_tracker(device_registration)
+    encrypted_user_secrets = device_registration.encryptedUserSecrets
 
     encrypted_identity_key = flip_bits(
-        device_registration.encryptedUserSecrets.encryptedIdentityKey,
+        encrypted_user_secrets.encryptedIdentityKey,
         is_mcu)
     owner_key = get_owner_key()
 
-    identity_key = decrypt_eik(owner_key, encrypted_identity_key)
-
-    return identity_key
+    try:
+        identity_key = decrypt_eik(owner_key, encrypted_identity_key)
+        return identity_key
+    except Exception as e:
+        print(f"Failed to decrypt identity key encrypted with owner key version {encrypted_user_secrets.ownerKeyVersion}: {str(e)}")
 
 
 def decrypt_location_response_locations(device_update_protobuf):
