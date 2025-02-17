@@ -13,7 +13,7 @@ Currently, it is possible to query Find My Device trackers and Android devices, 
 ### Known Issues
 - There seem to be issues with the package "undetected-chromedriver" not detecting Chrome on Windows and ARM Linux. macOS is working fine.
 - No support for trackers using the P-256 curve and 32-Byte advertisements. Regular trackers don't seem to use this curve at all - I can only confirm that it is used with Sony's WH1000XM5 headphones.
-- "Your encryption data is locked on your device" is shown if you have never paired an Find My Device tracker with your phone. Solution: Temporalily pair a tracker with your phone.
+- "Your encryption data is locked on your device" is shown if you have never paired an Find My Device tracker with an Android device. Solution: Temporarily pair a tracker with your phone.
 
 ### Firmware for custom ESP32-based trackers
 If you want to use an ESP32 as a custom Find My Device tracker, you can find the firmware in the folder ESP32Firmware. To register a new tracker, run main.py and press 'r' if you are asked to. Afterward, follow the instructions on-screen.
