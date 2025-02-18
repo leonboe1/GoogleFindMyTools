@@ -41,15 +41,21 @@ def find_chrome():
     return None
 
 
-def create_driver():
-    """Create a Chrome WebDriver with undetected_chromedriver."""
+def get_options():
     chrome_options = uc.ChromeOptions()
     chrome_options.add_argument("--start-maximized")
     chrome_options.add_argument("--disable-extensions")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
 
+    return chrome_options
+
+
+def create_driver():
+    """Create a Chrome WebDriver with undetected_chromedriver."""
+
     try:
+        chrome_options = get_options()
         driver = uc.Chrome(options=chrome_options)
         print("[ChromeDriver] Installed and browser started.")
         return driver
@@ -58,6 +64,7 @@ def create_driver():
 
         chrome_path = find_chrome()
         if chrome_path:
+            chrome_options = get_options()
             chrome_options.binary_location = chrome_path
             try:
                 driver = uc.Chrome(options=chrome_options)
