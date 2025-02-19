@@ -21,4 +21,4 @@ def get_eid_info():
 
 
 if __name__ == '__main__':
-    print(get_eid_info().encryptedOwnerKeyAndMetadata.encryptedOwnerKey.hex())
+    print(get_eid_info().encryptedOwnerKeyAndMetadata)

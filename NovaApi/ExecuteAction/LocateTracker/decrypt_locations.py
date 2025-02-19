@@ -13,6 +13,7 @@ from ProtoDecoders import DeviceUpdate_pb2
 from ProtoDecoders import Common_pb2
 from ProtoDecoders.DeviceUpdate_pb2 import DeviceRegistration
 from ProtoDecoders.decoder import parse_device_update_protobuf
+from SpotApi.GetEidInfoForE2eeDevices.get_eid_info_request import get_eid_info
 from SpotApi.GetEidInfoForE2eeDevices.get_owner_key import get_owner_key
 from SpotApi.CreateBleDevice.create_ble_device import mcu_fast_pair_model_id, flip_bits
 
@@ -35,7 +36,21 @@ def retrieve_identity_key(device_registration: DeviceRegistration) -> bytes:
         identity_key = decrypt_eik(owner_key, encrypted_identity_key)
         return identity_key
     except Exception as e:
-        print(f"Failed to decrypt identity key encrypted with owner key version {encrypted_user_secrets.ownerKeyVersion}: {str(e)}")
+
+        e2eeData = get_eid_info()
+        current_owner_key_version = e2eeData.encryptedOwnerKeyAndMetadata.ownerKeyVersion
+
+        print("")
+        print("-" * 40)
+        print("Attention:")
+        print("-" * 40)
+
+        if encrypted_user_secrets.ownerKeyVersion < current_owner_key_version:
+            print(f"Failed to decrypt E2EE data. This tracker was encrypted with owner key version {encrypted_user_secrets.ownerKeyVersion}, but the current owner key version is {current_owner_key_version}.\nThis happens if you reset your end-to-end-encrypted data in the past.\nThe tracker cannot be decrypted anymore, and it is recommended to remove it in the Find My Device app.")
+            exit(1)
+        else:
+            print(f"Failed to decrypt identity key encrypted with owner key version {encrypted_user_secrets.ownerKeyVersion}, current owner key version is {current_owner_key_version}.\nThis may happen if you reset your end-to-end-encrypted data. To resolve this issue, open the folder 'Auth' and delete the file 'secrets.json'.")
+            exit(1)
 
 
 def decrypt_location_response_locations(device_update_protobuf):
