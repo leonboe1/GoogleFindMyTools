@@ -13,9 +13,10 @@ from ProtoDecoders import DeviceUpdate_pb2
 from ProtoDecoders import Common_pb2
 from ProtoDecoders.DeviceUpdate_pb2 import DeviceRegistration
 from ProtoDecoders.decoder import parse_device_update_protobuf
+from SpotApi.CreateBleDevice.config import mcu_fast_pair_model_id
+from SpotApi.CreateBleDevice.util import flip_bits
 from SpotApi.GetEidInfoForE2eeDevices.get_eid_info_request import get_eid_info
 from SpotApi.GetEidInfoForE2eeDevices.get_owner_key import get_owner_key
-from SpotApi.CreateBleDevice.create_ble_device import mcu_fast_pair_model_id, flip_bits
 
 
 # Indicates if the device is a custom microcontroller

@@ -10,21 +10,10 @@ from FMDNCrypto.key_derivation import FMDNOwnerOperations
 from FMDNCrypto.eid_generator import ROTATION_PERIOD, generate_eid
 from KeyBackup.cloud_key_decryptor import encrypt_aes_gcm
 from ProtoDecoders.DeviceUpdate_pb2 import DeviceComponentInformation, SpotDeviceType, RegisterBleDeviceRequest, PublicKeyIdList
+from SpotApi.CreateBleDevice.config import mcu_fast_pair_model_id, max_truncated_eid_seconds_server
+from SpotApi.CreateBleDevice.util import flip_bits
 from SpotApi.GetEidInfoForE2eeDevices.get_owner_key import get_owner_key
 from SpotApi.spot_request import spot_request
-
-mcu_fast_pair_model_id = "003200"
-
-def hours_to_seconds(hours):
-    return hours * 3600
-
-
-def flip_bits(data: bytes, enabled: bool) -> bytes:
-    """Flips all bits in each byte of the given byte sequence."""
-    if enabled:
-        return bytes(b ^ 0xFF for b in data)
-
-    return data
 
 
 def register_esp32():
@@ -44,7 +33,7 @@ def register_esp32():
 
     # Device Components Information
     component_information = DeviceComponentInformation()
-    component_information.imageUrl = "https://m.media-amazon.com/images/I/61o2ZUzB4XL._AC_UF1000,1000_QL80_.jpg"
+    component_information.imageUrl = "https://docs.espressif.com/projects/esp-idf/en/v4.3/esp32/_images/esp32-DevKitM-1-isometric.png"
     register_request.description.deviceComponentsInformation.append(component_information)
 
     # Capabilities
@@ -71,7 +60,7 @@ def register_esp32():
     truncated_eid = eid[:10]
 
     # announce advertisements
-    for _ in range(int(hours_to_seconds(3000) / ROTATION_PERIOD)):
+    for _ in range(int(max_truncated_eid_seconds_server / ROTATION_PERIOD)):
         pub_key_id = PublicKeyIdList.PublicKeyIdInfo()
         pub_key_id.publicKeyId.truncatedEid = truncated_eid
         pub_key_id.timestamp.seconds = time_counter
