@@ -19,6 +19,19 @@ from SpotApi.GetEidInfoForE2eeDevices.get_eid_info_request import get_eid_info
 from SpotApi.GetEidInfoForE2eeDevices.get_owner_key import get_owner_key
 
 
+def create_google_maps_link(latitude, longitude):
+    try:  
+        latitude = float(latitude)
+        longitude = float(longitude)
+        if not (-90 <= latitude <= 90 and -180 <= longitude <= 180):
+            raise ValueError("Invalid latitude or longitude values.")
+    except ValueError as e:
+        return f"Error: {e}" #more descriptive error message for the user
+    base_url = "https://www.google.com/maps/search/?api=1"
+    query_params = f"query={latitude},{longitude}"  
+
+    return f"{base_url}&{query_params}"
+
 # Indicates if the device is a custom microcontroller
 def is_mcu_tracker(device_registration: DeviceRegistration) -> bool:
     return device_registration.fastPairModelId == mcu_fast_pair_model_id
@@ -134,7 +147,8 @@ def decrypt_location_response_locations(device_update_protobuf):
             print(f"Latitude: {latitude}")
             print(f"Longitude: {longitude}")
             print(f"Altitude: {altitude}")
-
+            print(f"Google Maps Link: {create_google_maps_link(latitude, longitude)}")
+            
         print(f"Time: {datetime.datetime.fromtimestamp(loc.time).strftime('%Y-%m-%d %H:%M:%S')}")
         print(f"Status: {loc.status}")
         print(f"Is Own Report: {loc.is_own_report}")
