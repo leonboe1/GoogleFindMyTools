@@ -4,7 +4,7 @@ This code enables you to use an ESP32-device as a custom Google Find My Device t
 
 The firmware works differently to regular Find My Device trackers. It is made to be as simple as possible. It has no Fast Pair support, MAC rotation, advertisement rotation, etc.
 
-Currently known working devices include the ESP32 and ESP32-C3. If you use a different board and it works/doesn't work, feel free to message me, I'll update this README then. 
+Currently known working devices include the ESP32 (Dev Module V1), the ESP32-CAM, and ESP32-C3. If you use a different board and it works/doesn't work, feel free to message me, I'll update this README then. 
 
 
 ## How to use
