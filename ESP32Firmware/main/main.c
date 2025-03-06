@@ -64,7 +64,7 @@ void hex_string_to_bytes(const char *hex, uint8_t *bytes, size_t len) {
 
 #if defined(CONFIG_IDF_TARGET_ESP32C3)
 // BLE advertising callback
-static void ble_advertise_cb(struct ble_gap_event *event, void *arg)
+static int ble_advertise_cb(struct ble_gap_event *event, void *arg)
 {
     switch (event->type) {
         case BLE_GAP_EVENT_ADV_COMPLETE:
@@ -73,6 +73,7 @@ static void ble_advertise_cb(struct ble_gap_event *event, void *arg)
         default:
             break;
     }
+    return 0;
 }
 
 // Set up and start advertising
