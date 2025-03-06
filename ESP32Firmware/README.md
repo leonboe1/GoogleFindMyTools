@@ -25,7 +25,7 @@ Currently known working devices include the ESP32 (Dev Module V1), the ESP32-CAM
 
 ## Known Issues
 
-- You need to run main.c every 4 days to keep receiving location reports from the server. This is because the advertisements have to be "announced" to Google. 
+- You need to run [`main.py`](../main.py) every 4 days to keep receiving location reports from the server. This is because the advertisements have to be "announced" to Google. 
 - Might not work with 'fresh' Google accounts: "Your encryption data is locked on your device" is shown if you have never paired a Find My Device tracker with an Android device. Solution: See [README of the parent folder](../README.md).
 - You cannot view locations for the ESP32 in the Google Find My Device app. You will need to use the Python script to do so.
 - No privacy features such as rotating MAC addresses are implemented
