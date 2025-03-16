@@ -92,4 +92,4 @@ def register_esp32(batch_mode=False):
         print("|" + " " * 30 + "Advertisement Key" + " " * 31 + "|")
         print("+" + "-" * 78 + "+")
     else:
-        print('JSON {name:"%s", eid:"%s"}' % (name, eid.hex()))
+        print('JSON {"name":"%s", "eid":"%s"}' % (name, eid.hex()))
