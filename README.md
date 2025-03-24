@@ -16,9 +16,9 @@ Currently, it is possible to query Find My Device trackers and Android devices, 
 
 ### Authentication
 
-On first run, authentication sequence is started in a new Chrome browser profile.
+On the first run, an authentication sequence is executed, which requires a computer with access to Google Chrome.
 
-The authentication results are stored in `Auth/secrets.json`.
+The authentication results are stored in `Auth/secrets.json`. If you intend to run this tool on a headless machine, you can just copy this file to avoid having to use Chrome.
 
 ### Known Issues
 - "Your encryption data is locked on your device" is shown if you have never set up Find My Device on an Android device. Solution: Login with your Google Account on an Android device, go to Settings > Google > All Services > Find My Device > Find your offline devices > enable "With network in all areas" or "With network in high-traffic areas only". If "Find your offline devices" is not shown in Settings, you will need to download the Find My Device app from Google's Play Store, and pair a real Find My Device tracker with your device to force-enable the Find My Device network.
