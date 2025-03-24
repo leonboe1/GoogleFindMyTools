@@ -2,9 +2,12 @@
 #  GoogleFindMyTools - A set of tools to interact with the Google Find My API
 #  Copyright © 2024 Leon Böttger. All rights reserved.
 #
+import hashlib
 from binascii import unhexlify
-
+from concurrent.futures import ProcessPoolExecutor
+import time
 import pyscrypt
+
 from example_data_provider import get_example_data
 
 
@@ -33,9 +36,26 @@ def get_lskf_hash(pin: str, salt: bytes) -> bytes:
 
     return hashed
 
-if __name__ == '__main__':
-
-    sample_pin = get_example_data("sample_pin")
+def hash_pin(pin):
     sample_pin_salt = unhexlify(get_example_data("sample_pin_salt"))
 
-    print(get_lskf_hash(sample_pin, sample_pin_salt).hex())
+    hash_object = hashlib.sha256(get_lskf_hash(pin, sample_pin_salt))
+    hash_hex = hash_object.hexdigest()
+
+    print(f"PIN: {pin}, Hash: {hash_hex}")
+    return pin, hash_hex
+
+
+if __name__ == '__main__':
+    start_time = time.time()
+    pins = [f"{i:04d}" for i in range(10000)]
+
+    with ProcessPoolExecutor() as executor:
+        results = list(executor.map(hash_pin, pins))
+
+    for pin, hashed in results:
+        print(f"PIN: {pin}, Hash: {hashed}")
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Time taken: {elapsed_time:.2f} seconds")
