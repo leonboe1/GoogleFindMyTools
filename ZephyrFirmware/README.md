@@ -7,6 +7,8 @@ It should support any board/chip with a BLE radio that is supported in Zephyr, f
  - Silicon EFR32BG22
  - ST BlueNRG-LP
  - ESP32
+ - Quectel BC68-GV
+ - TTGO T-BEAM
 
 
 ## Installation
