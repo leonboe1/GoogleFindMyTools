@@ -29,7 +29,7 @@ def create_location_request(canonic_device_id, fcm_registration_id, request_uuid
     return hex_payload
 
 
-def get_location_data_for_device(canonic_device_id, name):
+def get_location_data_for_device(canonic_device_id, name, batch_mode=False):
 
     print(f"[LocationRequest] Requesting location data for {name}...")
 
@@ -53,7 +53,7 @@ def get_location_data_for_device(canonic_device_id, name):
     while result is None:
         asyncio.get_event_loop().run_until_complete(asyncio.sleep(0.1))
 
-    decrypt_location_response_locations(result)
+    decrypt_location_response_locations(result, batch_mode=batch_mode)
 
 if __name__ == '__main__':
     get_location_data_for_device(get_example_data("sample_canonic_device_id"), "Test")
