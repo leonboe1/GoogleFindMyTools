@@ -1,4 +1,4 @@
-# Find My Device ESP32 Firmware
+# Find My Device Zephyr Firmware
 
 This code enables you to use a Zephyr-supported BLE device as a custom Google Find My Device tracker.
 It should support any board/chip with a BLE radio that is supported in Zephyr, for example:
@@ -12,6 +12,13 @@ It should support any board/chip with a BLE radio that is supported in Zephyr, f
 
 
 ## Installation
+
+Clone the repository and change to the ZephyrFirmware directory:
+
+```
+git clone git@github.com:leonboe1/GoogleFindMyTools.git
+cd ZephyrFirmware
+```
 
 Follow the [official instructions](https://docs.zephyrproject.org/latest/develop/getting_started/index.html#install-dependencies) to install Zephyr's dependencies.
 
@@ -51,6 +58,14 @@ To build with UART logging:
 
 ```
 west build -p -b nrf52840dk/nrf52840 app -- -DEXTRA_CONF_FILE=logging.conf
+```
+
+## Flashing
+
+Use west to flash the resulting binary
+
+```
+west flash
 ```
 
 ## Known Issues
