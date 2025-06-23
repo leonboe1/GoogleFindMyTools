@@ -20,7 +20,7 @@ from SpotApi.GetEidInfoForE2eeDevices.get_owner_key import get_owner_key
 
 
 def create_google_maps_link(latitude, longitude):
-    try:  
+    try:
         latitude = float(latitude)
         longitude = float(longitude)
         if not (-90 <= latitude <= 90 and -180 <= longitude <= 180):
@@ -28,7 +28,7 @@ def create_google_maps_link(latitude, longitude):
     except ValueError as e:
         return f"Error: {e}" #more descriptive error message for the user
     base_url = "https://www.google.com/maps/search/?api=1"
-    query_params = f"query={latitude},{longitude}"  
+    query_params = f"query={latitude},{longitude}"
 
     return f"{base_url}&{query_params}"
 
@@ -67,7 +67,7 @@ def retrieve_identity_key(device_registration: DeviceRegistration) -> bytes:
             exit(1)
 
 
-def decrypt_location_response_locations(device_update_protobuf):
+def decrypt_location_response_locations(device_update_protobuf, batch_mode=False):
 
     device_registration = device_update_protobuf.deviceMetadata.information.deviceRegistration
 
@@ -124,38 +124,66 @@ def decrypt_location_response_locations(device_update_protobuf):
             )
             location_time_array.append(wrapped_location)
 
-    print("-" * 40)
-    print("[DecryptLocations] Decrypted Locations:")
-
-    if not location_time_array:
-        print("No locations found.")
-        return
-
-    for loc in location_time_array:
-
-        if loc.status == Common_pb2.Status.SEMANTIC:
-            print(f"Semantic Location: {loc.name}")
-
-        else:
-            proto_loc = DeviceUpdate_pb2.Location()
-            proto_loc.ParseFromString(loc.decrypted_location)
-
-            latitude = proto_loc.latitude / 1e7
-            longitude = proto_loc.longitude / 1e7
-            altitude = proto_loc.altitude
-
-            print(f"Latitude: {latitude}")
-            print(f"Longitude: {longitude}")
-            print(f"Altitude: {altitude}")
-            print(f"Google Maps Link: {create_google_maps_link(latitude, longitude)}")
-            
-        print(f"Time: {datetime.datetime.fromtimestamp(loc.time).strftime('%Y-%m-%d %H:%M:%S')}")
-        print(f"Status: {loc.status}")
-        print(f"Is Own Report: {loc.is_own_report}")
+    if batch_mode is False:
         print("-" * 40)
+        print("[DecryptLocations] Decrypted Locations:")
 
-    pass
+        if not location_time_array:
+            print("No locations found.")
+            return
 
+        for loc in location_time_array:
+
+            if loc.status == Common_pb2.Status.SEMANTIC:
+                print(f"Semantic Location: {loc.name}")
+
+            else:
+                proto_loc = DeviceUpdate_pb2.Location()
+                proto_loc.ParseFromString(loc.decrypted_location)
+
+                latitude = proto_loc.latitude / 1e7
+                longitude = proto_loc.longitude / 1e7
+                altitude = proto_loc.altitude
+
+                print(f"Latitude: {latitude}")
+                print(f"Longitude: {longitude}")
+                print(f"Altitude: {altitude}")
+                print(f"Google Maps Link: {create_google_maps_link(latitude, longitude)}")
+
+            print(f"Time: {datetime.datetime.fromtimestamp(loc.time).strftime('%Y-%m-%d %H:%M:%S')}")
+            print(f"Status: {loc.status}")
+            print(f"Is Own Report: {loc.is_own_report}")
+            print("-" * 40)
+
+    else:
+        # batch mode
+        if not location_time_array:
+            print("JSON {}")
+            return
+
+        for loc in location_time_array:
+            ts=datetime.datetime.fromtimestamp(loc.time).strftime('%Y-%m-%d %H:%M:%S')
+
+            if loc.status == Common_pb2.Status.SEMANTIC:
+                name=loc.name # Semantic Location
+                lat=None
+                lon=None
+                alt=None
+
+            else:
+                proto_loc = DeviceUpdate_pb2.Location()
+                proto_loc.ParseFromString(loc.decrypted_location)
+
+                latitude = proto_loc.latitude / 1e7
+                longitude = proto_loc.longitude / 1e7
+                altitude = proto_loc.altitude
+
+                name=''
+                lat=latitude
+                lon=longitude
+                alt=altitude
+            # format https://www.traccar.org/osmand/
+            print(f'JSON {{"timestamp":"{ts}", "lat":{lat}, "lon":{lon}, "altitude":{alt}, "posname":"{name}"}}')
 
 if __name__ == '__main__':
     res = parse_device_update_protobuf("")
