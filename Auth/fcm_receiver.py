@@ -35,6 +35,7 @@ class FcmReceiver:
             api_key=api_key,
             messaging_sender_id=message_sender_id,
             bundle_id="com.google.android.apps.adm",
+            android_cert_sha1="38918a453d07199354f8b19af05ec6562ced5788",
         )
 
         self.credentials = get_cached_value('fcm_credentials')

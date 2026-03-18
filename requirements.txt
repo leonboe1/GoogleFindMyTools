@@ -1,5 +1,6 @@
 undetected-chromedriver>=3.5.5
 selenium>=4.27.1
+webdriver-manager>=4.0.2
 gpsoauth>=1.1.1
 requests>=2.32.3
 beautifulsoup4>=4.12.3

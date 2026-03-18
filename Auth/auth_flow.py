@@ -4,7 +4,7 @@
 #
 
 from selenium.webdriver.support.ui import WebDriverWait
-from chrome_driver import create_driver
+from chrome_driver import create_driver, safe_quit_driver
 
 def request_oauth_account_token_flow():
 
@@ -41,8 +41,8 @@ def request_oauth_account_token_flow():
         return oauth_token_value
 
     finally:
-        # Close the browser
-        driver.quit()
+        # Close the browser safely
+        safe_quit_driver(driver)
 
 if __name__ == '__main__':
     request_oauth_account_token_flow()

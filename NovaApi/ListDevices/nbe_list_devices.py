@@ -47,6 +47,16 @@ def list_devices():
     device_list = parse_device_list_protobuf(result_hex)
 
     refresh_custom_trackers(device_list)
+
+    # Auto-retrieve shared_key so secrets.json is complete before export
+    try:
+        from KeyBackup.shared_key_retrieval import get_shared_key
+        get_shared_key()
+        print("[SharedKey] Shared key cached successfully.")
+    except Exception as e:
+        print(f"[SharedKey] Warning: Could not retrieve shared key: {e}")
+        print("[SharedKey] You can retry later by locating a device.")
+
     canonic_ids = get_canonic_ids(device_list)
 
     print("")
