@@ -20,6 +20,20 @@ Currently, it is possible to query Find My Device / Find Hub trackers and Androi
 - Install the latest version of Google Chrome: https://www.google.com/chrome/
 - Start the program by running [main.py](main.py): `python main.py` or `python3 main.py`
 
+### Docker (alternative — no local Python/Chrome needed)
+
+Runs the tool in a container with Chrome + noVNC bundled, so the one-time Google login happens in a browser tab instead of a local Chrome install. See [MANUAL.md](MANUAL.md) for full details/troubleshooting; quick start:
+
+```bash
+git clone https://github.com/leonboe1/GoogleFindMyTools.git
+cd GoogleFindMyTools
+docker compose up
+```
+
+- Wait for `[AuthFlow] Press Enter to continue...` in the terminal, press **Enter**.
+- Open `http://localhost:7900` in your browser (password: `secret`) and log into your Google account there.
+- Once login completes, `main.py` proceeds to list your devices. Auth is cached to `data/secrets.json` on the host, so future runs (`docker compose up`) skip the browser step.
+
 ### Authentication
 
 On the first run, an authentication sequence is executed, which requires a computer with access to Google Chrome.
