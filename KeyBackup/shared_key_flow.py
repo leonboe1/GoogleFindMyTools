@@ -56,11 +56,9 @@ def request_shared_key_flow():
                 if data['method'] == 'setVaultSharedKeys':
                     shared_key = get_fmdn_shared_key(data['vaultKeys'])
                     print("[SharedKeyFlow] Received Shared Key.")
-                    driver.quit()
                     return shared_key.hex()
                 elif data['method'] == 'closeView':
                     print("[SharedKeyFlow] closeView() called. Closing browser.")
-                    driver.quit()
                     break
 
             except Exception:

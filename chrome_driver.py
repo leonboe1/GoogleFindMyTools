@@ -8,6 +8,20 @@ import shutil
 import platform
 import time
 
+
+class _ChromeDriver(uc.Chrome):
+    """Chrome driver with safe cleanup for undetected-chromedriver on Windows."""
+
+    def quit(self):
+        try:
+            super().quit()
+        except OSError as error:
+            # undetected-chromedriver can raise this while its destructor retries
+            # cleanup after Windows has already closed the wait handle.
+            if getattr(error, "winerror", None) != 6:
+                raise
+
+
 def find_chrome():
     """Find Chrome executable using known paths and system commands."""
     possiblePaths = [
@@ -58,7 +72,7 @@ def create_driver():
             pass
             
         chrome_options = get_options()
-        driver = uc.Chrome(options=chrome_options, version_main=None)
+        driver = _ChromeDriver(options=chrome_options, version_main=None)
         print("[ChromeDriver] Installed and browser started.")
         return driver
     except Exception as e:
@@ -69,7 +83,7 @@ def create_driver():
             chrome_options = get_options()
             chrome_options.binary_location = chrome_path
             try:
-                driver = uc.Chrome(options=chrome_options, version_main=None)
+                driver = _ChromeDriver(options=chrome_options, version_main=None)
                 print(f"[ChromeDriver] ChromeDriver started using {chrome_path}")
                 return driver
             except Exception as e:
@@ -82,7 +96,7 @@ def create_driver():
         try:
             chrome_options = get_options()
             chrome_options.add_argument("--headless")
-            driver = uc.Chrome(options=chrome_options, version_main=None)
+            driver = _ChromeDriver(options=chrome_options, version_main=None)
             print("[ChromeDriver] Started in headless mode successfully.")
             return driver
         except Exception as e:
