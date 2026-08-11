@@ -32,7 +32,15 @@ def nova_request(api_scope, hex_payload):
         return response.content.hex()
     else:
         soup = BeautifulSoup(response.text, 'html.parser')
-        print("[NovaRequest] Error: ", soup.get_text())
+        error_text = soup.get_text().strip()
+        print("[NovaRequest] Error: ", error_text)
+        # Every caller either discards this return value or waits on some
+        # other side effect of the request actually arriving (e.g. an FCM
+        # push for a locate action). Silently returning None here made a
+        # rejected request indistinguishable from "accepted, but nothing
+        # ever came back", forcing callers to burn a full timeout before
+        # reporting a failure that was already known immediately.
+        raise RuntimeError(f"Nova request to {api_scope} failed with {response.status_code}: {error_text}")
 
 
 if __name__ == '__main__':

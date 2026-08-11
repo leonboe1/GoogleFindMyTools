@@ -14,25 +14,23 @@ def _transform_to_byte_array(json_object):
 
 def get_fmdn_shared_key(vault_keys):
     json_object = json.loads(vault_keys)
-    processed_data = {}
 
-    # Iterate through the keys in the JSON object
     for key in json_object:
         if key == "finder_hw":
             json_array = json_object[key]
-            array_list2 = []
+            if not json_array:
+                continue
 
-            # Iterate through the JSON array
-            for item in json_array:
-                epoch = item["epoch"]
-                key_data = item["key"]
-
-                processed_key = _transform_to_byte_array(key_data)
-                array_list2.append({"epoch": epoch, "key": processed_key})
-
-                return processed_key
-
-            processed_data[key] = array_list2
+            # Google's vault can hold multiple key generations ("epochs") for this
+            # security domain if the account's FMDN owner key was ever rotated -
+            # always take the newest one instead of whichever entry the array lists
+            # first, or a stale/rotated-out epoch gets used and every decrypt against
+            # current device data fails forever (see NovaApi's owner-key-version
+            # mismatch error). The old code here unconditionally returned after the
+            # first array entry and never compared epochs at all.
+            latest = max(json_array, key=lambda item: int(item["epoch"]))
+            print(f"[ResponseParser] Selected vault key epoch {latest['epoch']} (of {len(json_array)} available).")
+            return _transform_to_byte_array(latest["key"])
 
     raise Exception("No suitable key found in the vault keys.")
 
