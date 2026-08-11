@@ -4,6 +4,8 @@
 #
 
 import binascii
+import datetime
+
 from NovaApi.ExecuteAction.LocateTracker.location_request import get_location_data_for_device
 from NovaApi.nova_request import nova_request
 from NovaApi.scopes import NOVA_LIST_DEVICS_API_SCOPE
@@ -56,8 +58,12 @@ def list_devices():
     print("")
     print("The following trackers are available:")
 
-    for idx, (device_name, canonic_id) in enumerate(canonic_ids, start=1):
-        print(f"{idx}. {device_name}: {canonic_id}")
+    for idx, (device_name, canonic_id, last_seen) in enumerate(canonic_ids, start=1):
+        if last_seen is None:
+            last_seen_str = "never"
+        else:
+            last_seen_str = datetime.datetime.fromtimestamp(last_seen).strftime('%Y-%m-%d %H:%M:%S')
+        print(f"{idx}. {device_name}: {canonic_id} (last seen: {last_seen_str})")
 
     selected_value = input("\nIf you want to see locations of a tracker, type the number of the tracker and press 'Enter'.\nIf you want to register a new ESP32- or Zephyr-based tracker, type 'r' and press 'Enter': ")
 

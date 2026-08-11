@@ -67,16 +67,38 @@ def parse_device_list_protobuf(hex_string):
     return device_list
 
 
+def get_last_seen(device) -> int | None:
+    """Unix timestamp of when this device was last seen, matching what the
+    real Find My Device web app shows for both device types, from whichever
+    of two different underlying sources actually applies:
+    - Phones: hardwareInfo.lastSeenTime (reverse engineered from a live
+      account capture, cross-checked against the real web app's own data
+      for the same device at the same moment - see DeviceHardwareInfo in
+      DeviceUpdate.proto for the caveats). Spot/BLE tags never have this.
+    - Spot/BLE tags (and phones too, as a fallback): the most recent
+      location report's own timestamp - there's no hardware-status concept
+      for a tag, so the web app uses "last reported a location" instead.
+    None if neither is present.
+    """
+    if device.HasField("hardwareInfo") and device.hardwareInfo.HasField("lastSeenTime"):
+        return device.hardwareInfo.lastSeenTime.seconds
+    recent = device.information.locationInformation.reports.recentLocationAndNetworkLocations
+    if recent.HasField("recentLocationTimestamp"):
+        return recent.recentLocationTimestamp.seconds
+    return None
+
+
 def get_canonic_ids(device_list):
     result = []
     for device in device_list.deviceMetadata:
-        if device.identifierInformation.type == DeviceUpdate_pb2.IDENTIFIER_ANDROID: 
+        if device.identifierInformation.type == DeviceUpdate_pb2.IDENTIFIER_ANDROID:
             canonic_ids = device.identifierInformation.phoneInformation.canonicIds.canonicId
         else:
             canonic_ids = device.identifierInformation.canonicIds.canonicId
         device_name = device.userDefinedDeviceName
+        last_seen = get_last_seen(device)
         for canonic_id in canonic_ids:
-            result.append((device_name, canonic_id.id))
+            result.append((device_name, canonic_id.id, last_seen))
     return result
 
 
