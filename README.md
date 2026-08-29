@@ -45,3 +45,8 @@ For more information, check the [README in the ZephyrFirmware folder](ZephyrFirm
 
 ### iOS App
 You can also use my [iOS App](https://testflight.apple.com/join/rGqa2mTe) to access your Find My Device trackers on the go.
+
+### Community projects
+Projects built by others on top of GoogleFindMyTools:
+
+- [**findmy-map**](https://github.com/EXxT4ZzY/google-findmy-map) – a self-hosted web UI that runs as an add-on container next to GoogleFindMyTools (sharing its `Auth/secrets.json`, no separate login). Shows all devices on a Leaflet/OpenStreetMap map and keeps a location history with a "visited places" timeline.
