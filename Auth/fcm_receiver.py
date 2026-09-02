@@ -3,7 +3,7 @@ import base64
 import binascii
 import threading
 
-from Auth.firebase_messaging import FcmRegisterConfig, FcmPushClient
+from Auth.firebase_messaging import FcmPushClientRunState, FcmRegisterConfig, FcmPushClient
 from Auth.token_cache import set_cached_value, get_cached_value
 
 class FcmReceiver:
@@ -45,13 +45,28 @@ class FcmReceiver:
 
         self.credentials = get_cached_value('fcm_credentials')
         self.location_update_callbacks = []
+        self._start_lock = threading.Lock()
         self.pc = FcmPushClient(self._on_notification, fcm_config, self.credentials, self._on_credentials_updated)
+
+
+    def _listener_dead(self):
+        # FcmPushClient can shut itself down after repeated errors and never restart on its own.
+        return self.pc.run_state in (FcmPushClientRunState.STOPPING, FcmPushClientRunState.STOPPED)
+
+
+    def _ensure_listening(self):
+        # Locked so two racing callers can't both restart it at once.
+        if self._listening and not self._listener_dead():
+            return self.credentials['gcm']['android_id']
+        with self._start_lock:
+            if self._listening and not self._listener_dead():
+                return self.credentials['gcm']['android_id']
+            return self._start_listener_in_background()
 
 
     def register_for_location_updates(self, callback):
 
-        if not self._listening:
-            self._start_listener_in_background()
+        self._ensure_listening()
 
         self.location_update_callbacks.append(callback)
 
@@ -67,7 +82,7 @@ class FcmReceiver:
     def get_android_id(self):
 
         if self.credentials is None:
-            return self._start_listener_in_background()
+            return self._ensure_listening()
 
         return self.credentials['gcm']['android_id']
 
@@ -126,6 +141,12 @@ class FcmReceiver:
 
     def _start_listener_in_background(self):
         """Start FCM listener in a background thread with its own event loop"""
+        if self._loop and self._loop.is_running():
+            # Stop the old loop/thread instead of leaking it on a restart.
+            self._loop.call_soon_threadsafe(self._loop.stop)
+            if self._loop_thread:
+                self._loop_thread.join(timeout=5)
+
         self._loop = asyncio.new_event_loop()
         self._loop_thread = threading.Thread(target=self._run_event_loop_in_thread, daemon=True)
         self._loop_thread.start()
