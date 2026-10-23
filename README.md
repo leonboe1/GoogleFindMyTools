@@ -44,4 +44,4 @@ If you want to use a Zephyr-supported BLE device (e.g. nRF51/52) as a custom Fin
 For more information, check the [README in the ZephyrFirmware folder](ZephyrFirmware/README.md).
 
 ### iOS App
-You can also use my [iOS App](https://testflight.apple.com/join/rGqa2mTe) to access your Find My Device trackers on the go.
+You can also use my [iOS App](https://github.com/leonboe1/Spot) to access your Find My Device trackers on the go.
