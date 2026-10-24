@@ -402,8 +402,13 @@ class FcmPushClient:  # pylint:disable=too-many-instance-attributes
         salt_str: str,
         raw_data: bytes,
     ) -> bytes:
-        crypto_key = urlsafe_b64decode(crypto_key_str.encode("ascii"))
-        salt = urlsafe_b64decode(salt_str.encode("ascii"))
+        # Per-message headers from the push service, unlike the two decodes
+        # below, come without their base64url padding often enough that this
+        # crashed the whole listener ("binascii.Error: Incorrect padding").
+        # Excess "=" is harmless to urlsafe_b64decode, same trick already
+        # used just below for der_data/secret.
+        crypto_key = urlsafe_b64decode(crypto_key_str.encode("ascii") + b"========")
+        salt = urlsafe_b64decode(salt_str.encode("ascii") + b"========")
         der_data_str = credentials["keys"]["private"]
         der_data = urlsafe_b64decode(der_data_str.encode("ascii") + b"========")
         secret_str = credentials["keys"]["secret"]
@@ -449,8 +454,15 @@ class FcmPushClient:  # pylint:disable=too-many-instance-attributes
         ):
             # The deleted_messages message does not contain data.
             return
-        crypto_key = self._app_data_by_key(msg, "crypto-key")[3:]  # strip dh=
-        salt = self._app_data_by_key(msg, "encryption")[5:]  # strip salt=
+        # Both headers can carry more than one ;-separated parameter (e.g.
+        # "dh=<point>;p256ecdsa=<other key>") - take only the value for the
+        # parameter we actually want. Keeping the rest used to decode into
+        # one garbage-length blob instead of raising (base64 silently drops
+        # the stray ";"/"=" characters from the second parameter rather than
+        # erroring on them), which then failed EC point validation with a
+        # confusing "Invalid EC key" deep inside http_ece.
+        crypto_key = self._app_data_by_key(msg, "crypto-key")[3:].split(";")[0]  # strip dh=
+        salt = self._app_data_by_key(msg, "encryption")[5:].split(";")[0]  # strip salt=
         subtype = self._app_data_by_key(msg, "subtype")
         if TYPE_CHECKING:
             assert self.credentials
@@ -461,6 +473,13 @@ class FcmPushClient:  # pylint:disable=too-many-instance-attributes
                 subtype,
                 self.credentials["gcm"]["app_id"],
             )
+            # Not meant for us - the shared MCS channel can carry data
+            # messages for other apps/services registered under the same
+            # Android ID. Decrypting one anyway with our own key material is
+            # guaranteed to fail (a foreign message's crypto-key isn't even
+            # necessarily in our expected format/curve), and used to crash
+            # the whole listener instead of just skipping this one message.
+            return
         if not self.credentials:
             return
         decrypted = self._decrypt_raw_data(
