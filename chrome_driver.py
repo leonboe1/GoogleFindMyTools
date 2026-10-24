@@ -16,7 +16,9 @@ def find_chrome():
         r"C:\ProgramData\chocolatey\bin\chrome.exe",
         r"C:\Users\%USERNAME%\AppData\Local\Google\Chrome\Application\chrome.exe",
         "/usr/bin/google-chrome",
+        "/usr/bin/chromium",
         "/usr/local/bin/google-chrome",
+        "/usr/local/bin/chromium",
         "/opt/google/chrome/chrome",
         "/snap/bin/chromium",
         "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
