@@ -104,9 +104,28 @@ message DeviceUpdate {
 
 message DeviceMetadata {
   IdentitfierInformation identifierInformation = 1;
+  // Phone-only hardware/status block (absent on Spot/BLE tags) - reverse
+  // engineered from a live account capture, cross-checked against the
+  // real Find My Device web app's own push-channel data for the same
+  // device at the same moment. Field numbers/names beyond lastSeenTime
+  // are best-effort based on shape/position, not independently confirmed.
+  DeviceHardwareInfo hardwareInfo = 3;
   DeviceInformation information = 4;
   string userDefinedDeviceName = 5;
   ImageInformation imageInformation = 6;
+}
+
+message DeviceHardwareInfo {
+  Time registrationTime = 2;
+  string model = 3;
+  string manufacturer = 4;
+  string codename = 5;
+  string carrier = 6;
+  string imei = 7;
+  // Confirmed by comparing this call's raw output against the same
+  // device's real-time push-channel data at the same moment - not just
+  // inferred from shape.
+  Time lastSeenTime = 10;
 }
 
 message ImageInformation {
