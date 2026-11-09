@@ -10,6 +10,10 @@ import time
 
 def find_chrome():
     """Find Chrome executable using known paths and system commands."""
+    env_path = os.environ.get("GFMT_CHROME_BINARY")
+    if env_path and os.path.exists(env_path):
+        return env_path
+
     possiblePaths = [
         r"C:\Program Files\Google\Chrome\Application\chrome.exe",
         r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
