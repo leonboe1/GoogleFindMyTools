@@ -24,7 +24,9 @@ Currently, it is possible to query Find My Device / Find Hub trackers and Androi
 
 On the first run, an authentication sequence is executed, which requires a computer with access to Google Chrome.
 
-The authentication results are stored in `Auth/secrets.json`. If you intend to run this tool on a headless machine, you can just copy this file to avoid having to use Chrome.
+The authentication results are stored in `Auth/auth.yaml`. If you intend to run this tool on a headless machine, you can just copy this file to avoid having to use Chrome. (If you're upgrading from an older version that still has `Auth/secrets.json`, it's migrated to `auth.yaml` automatically the first time it's read; the old file is left in place, untouched.)
+
+Set the `SECRETS_ENCRYPTION_KEY` environment variable (any string) to encrypt everything in `auth.yaml` at rest (AES-256-GCM) instead of storing it as plain text. Leaving it unset keeps the previous plain-text behavior and prints a one-time warning saying so. Losing or changing this key makes existing encrypted values unreadable; you'd need to sign in again to regenerate them.
 
 ### Known Issues
 - "Your encryption data is locked on your device" is shown if you have never set up Find My Device on an Android device. Solution: Login with your Google Account on an Android device, go to Settings > Google > All Services > Find My Device > Find your offline devices > enable "With network in all areas" or "With network in high-traffic areas only". If "Find your offline devices" is not shown in Settings, you will need to download the Find My Device app from Google's Play Store, and pair a real Find My Device tracker with your device to force-enable the Find My Device network.
