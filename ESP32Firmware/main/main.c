@@ -8,8 +8,8 @@
 
 #define TAG "ESP_FMDN"
 
-#if defined(CONFIG_IDF_TARGET_ESP32C3)
-#include "esp_nimble_hci.h"
+#if defined(CONFIG_IDF_TARGET_ESP32C3) || defined(CONFIG_IDF_TARGET_ESP32S3)
+// #include "esp_nimble_hci.h"
 #include "nimble/nimble_port.h"
 #include "nimble/nimble_port_freertos.h"
 #include "host/ble_hs.h"
@@ -62,7 +62,7 @@ void hex_string_to_bytes(const char *hex, uint8_t *bytes, size_t len) {
     }
 }
 
-#if defined(CONFIG_IDF_TARGET_ESP32C3)
+#if defined(CONFIG_IDF_TARGET_ESP32C3) || defined(CONFIG_IDF_TARGET_ESP32S3)
 // BLE advertising callback
 static int ble_advertise_cb(struct ble_gap_event *event, void *arg)
 {
@@ -106,12 +106,16 @@ static void ble_host_task(void *param)
 static void on_sync(void)
 {
     // Set device name
+#if defined(CONFIG_IDF_TARGET_ESP32C3)
     ble_svc_gap_device_name_set("ESP32-C3-BLE");
+#elif defined(CONFIG_IDF_TARGET_ESP32S3)
+    ble_svc_gap_device_name_set("ESP32-S3-BLE");
+#endif
     
     // Start advertising
     ble_start_advertising(adv_raw_data, sizeof(adv_raw_data));
     //print adv raw data
-    ESP_LOGI(TAG, "adv_raw_data: %s", adv_raw_data);
+    ESP_LOG_BUFFER_HEX(TAG, adv_raw_data, sizeof(adv_raw_data));
 }
 #endif
 
@@ -131,7 +135,7 @@ void app_main() {
     hex_string_to_bytes(eid_string, eid_bytes, 20);
     memcpy(&adv_raw_data[8], eid_bytes, 20);
 
-    #if defined(CONFIG_IDF_TARGET_ESP32C3)
+    #if defined(CONFIG_IDF_TARGET_ESP32C3) || defined(CONFIG_IDF_TARGET_ESP32S3)
         ESP_LOGI(TAG, "Initializing BLE");
         
         // Initialize NimBLE - ESP-IDF v5.3 style
