@@ -3,6 +3,7 @@
 /.idea
 /DULT/OwnerLookup/Results
 /Auth/secrets.json
+/data/secrets.json
 /example_data.json
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos,xcode,swift,swiftpackagemanager,objective-c
@@ -186,3 +187,4 @@ venv/
 *** Python cache***
 *.pyc  
 # End of https://www.toptal.com/developers/gitignore/api/macos,xcode,swift,swiftpackagemanager,objective-c
+data/secrets.json

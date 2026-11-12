@@ -4,9 +4,27 @@
 #
 import undetected_chromedriver as uc
 import os
+import re
 import shutil
+import subprocess
 import platform
 import time
+
+def get_chrome_major_version(chrome_path=None):
+    """Return installed Chrome's major version, or None if it can't be determined."""
+    candidates = [chrome_path] if chrome_path else []
+    candidates += ["google-chrome", "/usr/bin/google-chrome", "chromium", "chromium-browser"]
+    for candidate in candidates:
+        if not candidate:
+            continue
+        try:
+            output = subprocess.check_output([candidate, "--version"], stderr=subprocess.STDOUT, text=True)
+        except Exception:
+            continue
+        match = re.search(r"(\d+)\.\d+\.\d+\.\d+", output)
+        if match:
+            return int(match.group(1))
+    return None
 
 def find_chrome():
     """Find Chrome executable using known paths and system commands."""
@@ -58,7 +76,8 @@ def create_driver():
             pass
             
         chrome_options = get_options()
-        driver = uc.Chrome(options=chrome_options, version_main=None)
+        version_main = get_chrome_major_version()
+        driver = uc.Chrome(options=chrome_options, version_main=version_main)
         print("[ChromeDriver] Installed and browser started.")
         return driver
     except Exception as e:
@@ -69,20 +88,22 @@ def create_driver():
             chrome_options = get_options()
             chrome_options.binary_location = chrome_path
             try:
-                driver = uc.Chrome(options=chrome_options, version_main=None)
+                version_main = get_chrome_major_version(chrome_path)
+                driver = uc.Chrome(options=chrome_options, version_main=version_main)
                 print(f"[ChromeDriver] ChromeDriver started using {chrome_path}")
                 return driver
             except Exception as e:
                 print(f"[ChromeDriver] ChromeDriver failed using path {chrome_path}: {e}")
         else:
             print("[ChromeDriver] No Chrome executable found in known paths.")
-        
+
         # Final fallback - try headless mode
         print("[ChromeDriver] Trying headless mode as last resort...")
         try:
             chrome_options = get_options()
             chrome_options.add_argument("--headless")
-            driver = uc.Chrome(options=chrome_options, version_main=None)
+            version_main = get_chrome_major_version(chrome_path)
+            driver = uc.Chrome(options=chrome_options, version_main=version_main)
             print("[ChromeDriver] Started in headless mode successfully.")
             return driver
         except Exception as e:

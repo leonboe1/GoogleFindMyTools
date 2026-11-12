@@ -1,0 +1,10 @@
+services:
+  googlefindmy:
+    build: .
+    stdin_open: true
+    tty: true
+    shm_size: "2g"
+    ports:
+      - "7900:7900"   # noVNC web viewer, password: secret
+    volumes:
+      - ./data/secrets.json:/app/Auth/secrets.json
