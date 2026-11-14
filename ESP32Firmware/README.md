@@ -1,11 +1,10 @@
 # Find My Device ESP32 Firmware
 
-This code enables you to use an ESP32-device as a custom Google Find My Device tracker. Note that the firmware is very experimental. 
+This code enables you to use an ESP32-device as a custom Google Find My Device tracker. Note that the firmware is very experimental.
 
 The firmware works differently to regular Find My Device trackers. It is made to be as simple as possible. It has no Fast Pair support, MAC rotation, advertisement rotation, etc.
 
-Currently known working devices include the ESP32 (Dev Module V1), the ESP32-CAM, and ESP32-C3. If you use a different board and it works/doesn't work, feel free to message me, I'll update this README then. 
-
+Currently known working devices include the ESP32 (Dev Module V1), the ESP32-CAM, and ESP32-C3. If you use a different board and it works/doesn't work, feel free to message me, I'll update this README then.
 
 ## How to use
 
@@ -22,11 +21,25 @@ Currently known working devices include the ESP32 (Dev Module V1), the ESP32-CAM
 - If asked, use UART as flash method
 - After flashing, the ESP32 will restart and start advertising as the Find My Device tracker previously registered
 
-
 ## Known Issues
 
-- You need to run [`main.py`](../main.py) every 4 days to keep receiving location reports from the server. This is because the advertisements have to be "announced" to Google. 
+- You need to run [`main.py`](../main.py) every 4 days to keep receiving location reports from the server. This is because the advertisements have to be "announced" to Google.
 - Might not work with 'fresh' Google accounts: "Your encryption data is locked on your device" is shown if you have never paired a Find My Device tracker with an Android device. Solution: See [README of the parent folder](../README.md).
 - You cannot view locations for the ESP32 in the Google Find My Device app. You will need to use the Python script to do so.
 - No privacy features such as rotating MAC addresses are implemented
 - The firmware was built to receive as many network reports as possible. Therefore, it might consume more power than necessary. To fix this, you can tweak the parameters (TX Power and advertising interval) in [`main.c`](main/main.c)
+
+### Troubleshooting
+
+**Error: `fatal error: nimble/nimble_port.h: No such file or directory`**
+
+If you encounter this error while building in VS Code (especially with newer ESP-IDF versions like v5.x or v6.x), your local `sdkconfig` file was likely generated with the default Bluetooth host (Bluedroid) before you switched the target to `esp32c3`.
+
+**Solution:**
+
+1. Open the ESP-IDF Menuconfig (Gear icon in the bottom VS Code toolbar).
+2. Navigate to `Component config` -> `Bluetooth`.
+3. Ensure `Bluetooth` is checked (Enabled).
+4. Change the `Bluetooth Host` from `Bluedroid` to `NimBLE - BLE only`.
+5. Save, close Menuconfig, and click Build again.
+   _(Alternatively, you can delete the `sdkconfig` file and the `build` folder to force a clean configuration)._
