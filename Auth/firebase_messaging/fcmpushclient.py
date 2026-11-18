@@ -396,14 +396,30 @@ class FcmPushClient:  # pylint:disable=too-many-instance-attributes
                 await self._reset()
 
     @staticmethod
+    def _header_param(header: str, name: str) -> str:
+        """Extract the 'name=value' entry from a Web Push header value.
+
+        The FCM 'crypto-key' app_data value can contain several parameters
+        separated by ';' (e.g. 'dh=<key>; p256ecdsa=<key>'). Passing the whole
+        string to the decoder fails with 'Invalid EC key'.
+        """
+        for part in header.split(";"):
+            part = part.strip()
+            if part.startswith(name + "="):
+                return part[len(name) + 1:]
+        raise RuntimeError(f"parametro '{name}' ausente no header {header!r}")
+
+    @staticmethod
     def _decrypt_raw_data(
         credentials: dict[str, dict[str, str]],
         crypto_key_str: str,
         salt_str: str,
         raw_data: bytes,
     ) -> bytes:
-        crypto_key = urlsafe_b64decode(crypto_key_str.encode("ascii"))
-        salt = urlsafe_b64decode(salt_str.encode("ascii"))
+        # Web Push base64url values are unpadded (RFC 8291); b64decode requires
+        # padding. Extra '=' is harmless and matches the der/secret handling below.
+        crypto_key = urlsafe_b64decode(crypto_key_str.encode("ascii") + b"========")
+        salt = urlsafe_b64decode(salt_str.encode("ascii") + b"========")
         der_data_str = credentials["keys"]["private"]
         der_data = urlsafe_b64decode(der_data_str.encode("ascii") + b"========")
         secret_str = credentials["keys"]["secret"]
@@ -449,8 +465,8 @@ class FcmPushClient:  # pylint:disable=too-many-instance-attributes
         ):
             # The deleted_messages message does not contain data.
             return
-        crypto_key = self._app_data_by_key(msg, "crypto-key")[3:]  # strip dh=
-        salt = self._app_data_by_key(msg, "encryption")[5:]  # strip salt=
+        crypto_key = self._header_param(self._app_data_by_key(msg, "crypto-key"), "dh")
+        salt = self._header_param(self._app_data_by_key(msg, "encryption"), "salt")
         subtype = self._app_data_by_key(msg, "subtype")
         if TYPE_CHECKING:
             assert self.credentials
